@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<form
+	lessfiles="media://COM_WS/css/backend.less||media://COM_WS/css/backend.css"
+	validate="true"
+>
+	<fieldset name="basic_configuration"
+		label="COM_WS_ITEMS_GROUP_BASIC"
+		description="COM_WS_ITEMS_GROUP_BASIC_DESC"
+		class="span6"
+	>
+		<field name="title" type="text"
+			class="inputbox"
+			label="COM_WS_ITEMS_FIELD_TITLE"
+			labelclass="todo-label todo-label-main"
+			required="true"
+			size="50"
+		 />
+		
+		<field name="due" type="calendar"
+			class="inputbox"
+			label="COM_WS_ITEMS_FIELD_DUE"
+			labelclass="todo-label"
+			required="true"
+			size="20"
+			default="NOW"
+		 />
+		<field name="enabled" type="list" label="JSTATUS"
+			labelclass="todo-label"
+			description="JFIELD_PUBLISHED_DESC" class="inputbox"
+			filter="intval" size="1" default="1"
+		>
+			<option value="1">JPUBLISHED</option>
+			<option value="0">JUNPUBLISHED</option>
+		</field>
+	</fieldset>
+
+	<fieldset name="description_group"
+		label="COM_WS_ITEMS_GROUP_DESCRIPTION"
+		description="COM_WS_ITEMS_GROUP_DESCRIPTION_DESC"
+		class="span6"
+	>
+		<field name="description" type="editor"
+			label=""
+			class="inputbox"
+			required="false"
+			filter="JComponentHelper::filterText" buttons="true"
+		/>
+	</fieldset>
+
+  <fieldset name="rules">
+
+    <field name="asset_id" type="hidden" emptylabel="true" filter="unset" />
+
+    <field name="rules"
+            type="rules"
+            emptylabel="true"
+            translate_label="false"
+            filter="rules"
+            validate="rules"
+            class="inputbox"
+            component="COM_WS"
+            section="unit" />
+  </fieldset>
+</form>

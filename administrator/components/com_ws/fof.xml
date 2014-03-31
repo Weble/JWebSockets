@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fof>
+	<frontend>
+		<view name="item">
+			<config>
+				<option name="behaviors">filters,private,enabled</option>
+			</config>
+		</view>
+	</frontend>
+</fof>
