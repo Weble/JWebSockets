@@ -1,6 +1,22 @@
 <?php
 
 class WsControllerItems extends FOFController {
+
+	public function send() {
+		$message = $this->input->get('message', '');		
+		$name = $this->input->get('name', '');		
+
+		$connections = WsApp::getConnections();
+		$activeConnection = WsApp::getActiveConnection();
+		
+		foreach ($connections as $connection) {
+			//if ($connection != $connection) {
+				$connection->send(json_encode(array('message' => $message, 'user' => $name)));
+			//}
+		}
+	}
+
+
 	public function ws(){
 
 		$this->loadAkeeba();
@@ -43,22 +59,33 @@ class WsControllerItems extends FOFController {
 			$model->setState('xmlname',		$this->input->get('xmlname', '', 'string'));
 		}
 
-		echo '7';
-
 		try {
 			$data = $model->runBackup();
+			
+			while ($data['HasRun'] == 0) {
+				$model->setState('ajax', 'step');
+				$data = $model->runBackup();
+
+				$connections = WsApp::getConnections();
+				$activeConnection = WsApp::getActiveConnection();
+
+				var_dump($connections);
+
+				foreach ($connections as $connection) {
+					$connection->send(json_encode($data));
+				}
+				
+
+				//$pusher = WsApp::getPusher()->trigger( 'backup', 'step', $data );
+			}
 		} catch(Exception $e) {
 			echo $e;
-		}
-
-		var_dump($data);
+		}		
 
 		$connections = WsApp::getConnections();
 		$activeConnection = WsApp::getActiveConnection();
 		
-		foreach ($connections as $conn) {
-			$conn->send(json_encode($data));
-		}
+		$activeConnection->send(json_encode($data));
 	}
 
 	protected function loadAkeeba() {
@@ -66,8 +93,6 @@ class WsControllerItems extends FOFController {
 		{
 			require_once JPATH_ADMINISTRATOR.'/components/com_akeeba/controllers/default.php';
 		}
-
-		ECHO '1';
 
 		// Merge the language overrides
 		$paths = array(JPATH_ROOT, JPATH_ADMINISTRATOR);
@@ -84,8 +109,6 @@ class WsControllerItems extends FOFController {
 
 		FOFInflector::addWord('alice', 'alices');
 
-		ECHO '2';
-
 		// Timezone fix; avoids errors printed out by PHP 5.3.3+ (thanks Yannick!)
 		if(function_exists('date_default_timezone_get') && function_exists('date_default_timezone_set')) {
 			if(function_exists('error_reporting')) {
@@ -101,7 +124,6 @@ class WsControllerItems extends FOFController {
 
 		$path_akeeba = JPATH_SITE . '/administrator/components/com_akeeba/';
 
-		ECHO '3';
 		// Necessary defines for Akeeba Engine
 		if(!defined('AKEEBAENGINE')) {
 			define('AKEEBAENGINE', 1); // Required for accessing Akeeba Engine's factory class
@@ -153,7 +175,5 @@ class WsControllerItems extends FOFController {
 		}
 
 		JFactory::$application = WsApp::getApplication();
-
-		ECHO '5';
 	}
 }
